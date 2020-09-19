@@ -1,26 +1,12 @@
-/*******************************************************************************
- * Wasserstandsanzeiger fÃ¼r Regenzisterne
- * surasto.de 2019
- * 
- * The code works on an Arduino with Draguino Shield
- * It is based on the lmic-library
- * 
- * Measureemnt by Ultrasonic Sensor
- * Full = 5cm
- * Empty = 60cm
- * 
- * Formula for % of full:
- * PercentFull = 100 - (Measurement - 5) 
- *******************************************************************************/
-
 #include <lmic.h>
 #include <hal/hal.h>
 #include <SPI.h>
 #include <CayenneLPP.h>
 
+// The Things Network Keys
 u1_t NWKSKEY[16] = { 0xD9, 0x2E, 0xCF, 0xF7, 0xC0, 0x60, 0x84, 0x3F, 0x64, 0xC8, 0x7D, 0x70, 0x46, 0x1B, 0x5D, 0xA6 };
 u1_t APPSKEY[16] = { 0x83, 0xBC, 0xF4, 0xCB, 0x14, 0x0B, 0x24, 0x9C, 0xA7, 0xC2, 0xDB, 0x5A, 0x4A, 0x6C, 0xC0, 0x7B };
-static const u4_t DEVADDR = 0x260118C2 ; // <-- Change this address for every node!
+static const u4_t DEVADDR = 0x260118C2 ; 
 
 // These callbacks are only used in over-the-air activation, so they are
 // left empty here (we cannot leave them out completely unless
@@ -35,9 +21,7 @@ float percentFull;
 
 CayenneLPP lpp(51);
 
-// Schedule TX every this many seconds (might become longer due to duty
-// cycle limitations).
-const unsigned TX_INTERVAL = 60;
+const unsigned TX_INTERVAL = 3600;
 
 // Pin mapping
 const lmic_pinmap lmic_pins = {
@@ -60,7 +44,6 @@ void onEvent (ev_t ev) {
 
    if( percentFull < 101 ) {
    if (ev == EV_TXCOMPLETE) {
-    Serial.println("AHORA!!!!!!!!!!!!!!!!!!!!!!!!!");
     os_setTimedCallback(&sendjob, os_getTime()+sec2osticks(TX_INTERVAL), do_send);
    }
    }
